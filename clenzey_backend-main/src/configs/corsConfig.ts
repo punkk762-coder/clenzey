@@ -8,11 +8,11 @@ export const isAllowedCorsOrigin = (origin: string | undefined): boolean => {
 
   const normalized = normalizeOrigin(origin);
 
-  if (envConfig.CORS_ORIGINS.includes("*") || envConfig.CORS_ORIGINS.includes(normalized)) {
+  if (envConfig.CORS_ORIGINS.includes(normalized)) {
     return true;
   }
 
-  if (envConfig.SOCKET_CORS_ORIGINS.includes("*") || envConfig.SOCKET_CORS_ORIGINS.includes(normalized)) {
+  if (envConfig.SOCKET_CORS_ORIGINS.includes(normalized)) {
     return true;
   }
 
