@@ -34,8 +34,7 @@
         "EXPO_PUBLIC_API_URL": "https://clenzey.onrender.com"
       },
       "android": {
-        "buildType": "apk",
-        "gradleCommand": ":app:assembleRelease"
+        "buildType": "apk"
       }
     },
     "production": {
@@ -55,8 +54,7 @@
         "EXPO_PUBLIC_API_URL": "https://clenzey.onrender.com"
       },
       "android": {
-        "buildType": "apk",
-        "gradleCommand": ":app:assembleRelease"
+        "buildType": "apk"
       }
     }
   },
