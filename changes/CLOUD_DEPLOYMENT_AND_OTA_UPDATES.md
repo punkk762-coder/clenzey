@@ -121,7 +121,7 @@ Switched cloud database cluster from Tokyo (`ap-northeast-1`) to **AWS South Asi
 
 ### Configuration
 * **Platform**: Vercel (Next.js 15)
-* **Root Directory**: `clenzey_admin-main`
+* **Live Production URL**: [https://clenzey-admin-tau.vercel.app/login](https://clenzey-admin-tau.vercel.app/login)
 * **Environment Variables**:
   * `NEXT_PUBLIC_API_BASE_URL`: `https://clenzey.onrender.com/api/v1`
   * `NEXT_PUBLIC_SOCKET_URL`: `https://clenzey.onrender.com`
@@ -131,9 +131,9 @@ Switched cloud database cluster from Tokyo (`ap-northeast-1`) to **AWS South Asi
 
 ## 8. Artifacts & Live Access URLs
 
-### 📱 Android APKs (Direct Downloads for Mentor):
-* **Consumer App APK**: [Download Consumer APK](https://expo.dev/artifacts/eas/Sbb19bWTCsJldp6wB1R8VVcynhw6qphrWrDdCIpkuBE.apk)
-* **Partner App APK**: [Download Partner APK](https://expo.dev/artifacts/eas/kJr92Sk_SjPdgTz80SNseBbLqWch4-FjcrWlmxoZNTk.apk)
+### 📱 Android APKs (Fresh Production Builds):
+* **Consumer App APK**: [Download Consumer APK](https://expo.dev/artifacts/eas/ihVtVx6bccSVhzEdMPlCE9J4cmrcsWJIcIXLN3cg5uw.apk)
+* **Partner App APK**: [Download Partner APK](https://expo.dev/artifacts/eas/Eg7VuHvJfGf0k5DE-SyzriZh-QK3er9CTOJStYTsH-E.apk)
 
 ### 🔑 Test Login Credentials:
 * **Customer**: `+919988776655` / `Test@1234` (`priya.consumer@clenzey.test`)
