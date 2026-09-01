@@ -52,15 +52,21 @@
       ],
       "expo-splash-screen"
     ],
+    "updates": {
+      "url": "https://u.expo.dev/63668e32-188f-4a99-be75-c6cf3acd3b22"
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
     "experiments": {
       "typedRoutes": true
     },
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "09bc2cab-c210-458c-bf3e-5a7924baaf6d"
+        "projectId": "63668e32-188f-4a99-be75-c6cf3acd3b22"
       }
     },
-    "owner": "clenzey"
+    "owner": "punkkkkk"
   }
 }

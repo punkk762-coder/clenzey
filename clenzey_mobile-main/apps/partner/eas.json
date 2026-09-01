@@ -7,8 +7,9 @@
     "development": {
       "developmentClient": true,
       "distribution": "internal",
+      "channel": "preview",
       "env": {
-        "EXPO_PUBLIC_API_URL": "http://10.71.225.208:3000"
+        "EXPO_PUBLIC_API_URL": "https://clenzey.onrender.com"
       },
       "android": {
         "buildType": "apk",
@@ -17,8 +18,9 @@
     },
     "preview": {
       "distribution": "internal",
+      "channel": "preview",
       "env": {
-        "EXPO_PUBLIC_API_URL": "http://10.71.225.208:3000"
+        "EXPO_PUBLIC_API_URL": "https://clenzey.onrender.com"
       },
       "android": {
         "buildType": "apk",
@@ -27,14 +29,19 @@
     },
     "production": {
       "distribution": "store",
+      "channel": "production",
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://clenzey.onrender.com"
+      },
       "android": {
         "buildType": "app-bundle"
       }
     },
     "production-apk": {
       "distribution": "internal",
+      "channel": "production",
       "env": {
-        "EXPO_PUBLIC_API_URL": "http://10.71.225.208:3000"
+        "EXPO_PUBLIC_API_URL": "https://clenzey.onrender.com"
       },
       "android": {
         "buildType": "apk",

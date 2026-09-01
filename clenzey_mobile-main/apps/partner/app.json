@@ -49,6 +49,12 @@
       "expo-font",
       "expo-splash-screen"
     ],
+    "updates": {
+      "url": "https://u.expo.dev/37a0d76a-9d42-49bf-b052-0fb771d12f33"
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
     "experiments": {
       "typedRoutes": true
     },
@@ -57,9 +63,9 @@
         "origin": false
       },
       "eas": {
-        "projectId": "1525cca7-a1a9-4640-bc37-6b6706ae9daf"
+        "projectId": "37a0d76a-9d42-49bf-b052-0fb771d12f33"
       }
     },
-    "owner": "clenzey"
+    "owner": "punkkkkk"
   }
 }
