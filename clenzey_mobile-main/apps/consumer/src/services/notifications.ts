@@ -42,28 +42,32 @@ function getDevicePlatform(): PushPlatform {
  * Sets up default notification behavior and creates a notification channel.
  */
 export function configureNotifications(): void {
-  const Notifications = getNotificationsModule();
-  if (!Notifications) {
-    return;
-  }
+  try {
+    const Notifications = getNotificationsModule();
+    if (!Notifications || !Notifications.setNotificationHandler) {
+      return;
+    }
 
-  Notifications.setNotificationHandler({
-    handleNotification: async () => ({
-      shouldShowAlert: false,
-      shouldPlaySound: true,
-      shouldSetBadge: true,
-      shouldShowBanner: false,
-      shouldShowList: false,
-    }),
-  });
-
-  if (Platform.OS === 'android') {
-    Notifications.setNotificationChannelAsync('default', {
-      name: 'Default',
-      importance: Notifications.AndroidImportance.HIGH,
-      vibrationPattern: [0, 250, 250, 250],
-      lightColor: '#0043BA',
+    Notifications.setNotificationHandler({
+      handleNotification: async () => ({
+        shouldShowAlert: false,
+        shouldPlaySound: true,
+        shouldSetBadge: true,
+        shouldShowBanner: false,
+        shouldShowList: false,
+      }),
     });
+
+    if (Platform.OS === 'android' && Notifications.setNotificationChannelAsync) {
+      Notifications.setNotificationChannelAsync('default', {
+        name: 'Default',
+        importance: Notifications.AndroidImportance.HIGH,
+        vibrationPattern: [0, 250, 250, 250],
+        lightColor: '#0043BA',
+      }).catch(() => {});
+    }
+  } catch (err) {
+    console.warn('Notification config error (safe fallback):', err);
   }
 }
 
@@ -73,26 +77,31 @@ export function configureNotifications(): void {
 export function setupForegroundNotificationHandler(
   onNotification: OnForegroundNotification,
 ): () => void {
-  const Notifications = getNotificationsModule();
-  if (!Notifications) {
+  try {
+    const Notifications = getNotificationsModule();
+    if (!Notifications || !Notifications.addNotificationReceivedListener) {
+      return () => undefined;
+    }
+
+    foregroundSubscription = Notifications.addNotificationReceivedListener(
+      (notification) => {
+        const { title, body } = notification?.request?.content ?? {};
+        if (title || body) {
+          onNotification(title ?? '', body ?? '');
+        }
+      },
+    );
+
+    return () => {
+      if (foregroundSubscription) {
+        foregroundSubscription.remove();
+        foregroundSubscription = null;
+      }
+    };
+  } catch (err) {
+    console.warn('Foreground notification listener error:', err);
     return () => undefined;
   }
-
-  foregroundSubscription = Notifications.addNotificationReceivedListener(
-    (notification) => {
-      const { title, body } = notification.request.content;
-      if (title || body) {
-        onNotification(title ?? '', body ?? '');
-      }
-    },
-  );
-
-  return () => {
-    if (foregroundSubscription) {
-      foregroundSubscription.remove();
-      foregroundSubscription = null;
-    }
-  };
 }
 
 /**
@@ -132,43 +141,52 @@ function handleNotificationResponse(
  * Set up notification response (press) handler for deep linking.
  */
 export function setupNotificationPressHandler(): () => void {
-  const Notifications = getNotificationsModule();
-  if (!Notifications) {
+  try {
+    const Notifications = getNotificationsModule();
+    if (!Notifications || !Notifications.addNotificationResponseReceivedListener) {
+      return () => undefined;
+    }
+
+    responseSubscription = Notifications.addNotificationResponseReceivedListener(
+      (response) => {
+        const data = response?.notification?.request?.content?.data as NotificationData;
+        handleNotificationResponse(data);
+      },
+    );
+
+    return () => {
+      if (responseSubscription) {
+        responseSubscription.remove();
+        responseSubscription = null;
+      }
+    };
+  } catch (err) {
+    console.warn('Notification press handler error:', err);
     return () => undefined;
   }
-
-  responseSubscription = Notifications.addNotificationResponseReceivedListener(
-    (response) => {
-      const data = response.notification.request.content.data as NotificationData;
-      handleNotificationResponse(data);
-    },
-  );
-
-  return () => {
-    if (responseSubscription) {
-      responseSubscription.remove();
-      responseSubscription = null;
-    }
-  };
 }
 
 /**
  * Handle a notification tap that launched the app from a killed state.
  */
 export async function handleColdStartNotification(): Promise<void> {
-  const Notifications = getNotificationsModule();
-  if (!Notifications) {
-    return;
-  }
+  try {
+    const Notifications = getNotificationsModule();
+    if (!Notifications || !Notifications.getLastNotificationResponseAsync) {
+      return;
+    }
 
-  const response = await Notifications.getLastNotificationResponseAsync();
-  if (!response) {
-    return;
+    const response = await Notifications.getLastNotificationResponseAsync();
+    if (response) {
+      handleNotificationResponse(
+        response.notification?.request?.content?.data as NotificationData,
+      );
+    }
+  } catch (err) {
+    console.warn('Cold start notification error:', err);
   }
-
-  const data = response.notification.request.content.data as NotificationData;
-  handleNotificationResponse(data);
 }
+
 
 /**
  * Request notification permissions and retrieve the device FCM push token.

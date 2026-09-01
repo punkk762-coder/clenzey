@@ -28,23 +28,28 @@ let responseSubscription: Notifications.Subscription | null = null;
  * Sets up default notification behavior and creates a notification channel.
  */
 export function configureNotifications(): void {
-  Notifications.setNotificationHandler({
-    handleNotification: async () => ({
-      shouldShowAlert: true,
-      shouldPlaySound: true,
-      shouldSetBadge: true,
-      shouldShowBanner: true,
-      shouldShowList: true,
-    }),
-  });
-
-  if (Platform.OS === 'android') {
-    Notifications.setNotificationChannelAsync('default', {
-      name: 'Default',
-      importance: Notifications.AndroidImportance.HIGH,
-      vibrationPattern: [0, 250, 250, 250],
-      lightColor: '#0043BA',
+  try {
+    if (!Notifications || !Notifications.setNotificationHandler) return;
+    Notifications.setNotificationHandler({
+      handleNotification: async () => ({
+        shouldShowAlert: true,
+        shouldPlaySound: true,
+        shouldSetBadge: true,
+        shouldShowBanner: true,
+        shouldShowList: true,
+      }),
     });
+
+    if (Platform.OS === 'android' && Notifications.setNotificationChannelAsync) {
+      Notifications.setNotificationChannelAsync('default', {
+        name: 'Default',
+        importance: Notifications.AndroidImportance.HIGH,
+        vibrationPattern: [0, 250, 250, 250],
+        lightColor: '#0043BA',
+      }).catch(() => {});
+    }
+  } catch (err) {
+    console.warn('Partner notification config error:', err);
   }
 }
 
@@ -60,21 +65,29 @@ export function configureNotifications(): void {
 export function setupForegroundNotificationHandler(
   onNotification: OnForegroundNotification,
 ): () => void {
-  foregroundSubscription = Notifications.addNotificationReceivedListener(
-    (notification) => {
-      const { title, body } = notification.request.content;
-      if (title || body) {
-        onNotification(title ?? '', body ?? '');
-      }
-    },
-  );
-
-  return () => {
-    if (foregroundSubscription) {
-      foregroundSubscription.remove();
-      foregroundSubscription = null;
+  try {
+    if (!Notifications || !Notifications.addNotificationReceivedListener) {
+      return () => undefined;
     }
-  };
+    foregroundSubscription = Notifications.addNotificationReceivedListener(
+      (notification) => {
+        const { title, body } = notification?.request?.content ?? {};
+        if (title || body) {
+          onNotification(title ?? '', body ?? '');
+        }
+      },
+    );
+
+    return () => {
+      if (foregroundSubscription) {
+        foregroundSubscription.remove();
+        foregroundSubscription = null;
+      }
+    };
+  } catch (err) {
+    console.warn('Partner foreground notification listener error:', err);
+    return () => undefined;
+  }
 }
 
 /**
