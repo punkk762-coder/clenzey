@@ -1,0 +1,21 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "strict": true,
+    "types": ["jest", "@types/react"],
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"],
+      "@clenzey/types": ["../../packages/types/src/index.ts"],
+      "@clenzey/types/*": ["../../packages/types/src/*"],
+      "@clenzey/api-client": ["../../packages/api-client/src/index.ts"],
+      "@clenzey/api-client/*": ["../../packages/api-client/src/*"],
+      "@clenzey/socket-client": ["../../packages/socket-client/src/index.ts"],
+      "@clenzey/socket-client/*": ["../../packages/socket-client/src/*"],
+      "@clenzey/design-system": ["../../packages/design-system/src/index.ts"],
+      "@clenzey/design-system/*": ["../../packages/design-system/src/*"]
+    }
+  },
+  "include": ["**/*.ts", "**/*.tsx", ".expo/types/**/*.ts", "expo-env.d.ts"],
+  "exclude": ["node_modules", "dist"]
+}

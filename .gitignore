@@ -1,0 +1,35 @@
+# Dependencies
+**/node_modules/
+node_modules/
+.pnpm-store
+
+# Environment files
+**/.env
+**/.env.local
+**/.env.prod
+**/.env.production
+**/.env.production.local
+**/.env.test.local
+
+# Allow example files
+!**/.env.example
+!**/.env.prod.example
+
+# Mobile build outputs & Expo
+**/.expo/
+**/.eas/
+*.apk
+*.aab
+*.ipa
+
+# Build outputs
+**/dist/
+**/build/
+**/.next/
+**/coverage/
+
+# System and logs
+*.log
+.DS_Store
+Thumbs.db
+graphify-out/

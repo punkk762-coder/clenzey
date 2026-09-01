@@ -1,0 +1,136 @@
+# Production stack for Utho Cloud VPS.
+# TLS terminates at Utho Load Balancer — no Caddy/nginx on this host.
+#
+# Prerequisites:
+#   - Clone clenzey_admin alongside this repo (../clenzey_admin)
+#   - Utho Load Balancer fronts api.clenzey.com → :3001, admin.clenzey.com → :4001
+#   - Cloud Firewall allows LB/VPC → ports 3001 and 4001 only
+#
+# Usage:
+#   cp .env.prod.example .env   # edit values first
+#   docker compose -f docker-compose.prod.yml up --build -d
+#   docker compose -f docker-compose.prod.yml exec backend \
+#     npx drizzle-kit migrate --config drizzle-migrate.config.ts
+
+name: clenzey-prod
+
+services:
+  db:
+    build:
+      context: .
+      dockerfile: Dockerfile.db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-clenzey}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+      POSTGRES_DB: ${POSTGRES_DB:-clenzey}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES_USER:-clenzey} -d ${POSTGRES_DB:-clenzey}",
+        ]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - internal
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - internal
+
+  backend:
+    build: .
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-clenzey}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-clenzey}
+      NODE_ENV: prod
+      PORT: 3001
+      REDIS_URL: redis://redis:6379
+      TRUST_PROXY: 1
+    ports:
+      - "3001:3001"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test:
+        ["CMD", "wget", "-qO-", "http://localhost:3001/api/v1/health/ready"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    networks:
+      - internal
+
+  worker:
+    build: .
+    restart: unless-stopped
+    command: ["node", "dist/src/workers/index.js"]
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-clenzey}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-clenzey}
+      NODE_ENV: prod
+      REDIS_URL: redis://redis:6379
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "kill -0 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    networks:
+      - internal
+
+  admin:
+    build:
+      context: ../clenzey_admin
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL:-https://api.clenzey.com/api/v1}
+        NEXT_PUBLIC_SOCKET_URL: ${NEXT_PUBLIC_SOCKET_URL:-https://api.clenzey.com}
+    restart: unless-stopped
+    ports:
+      - "4001:4001"
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test:
+        ["CMD", "wget", "-qO-", "http://localhost:4001/login"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 60s
+    networks:
+      - internal
+
+networks:
+  internal:
+    driver: bridge
+
+volumes:
+  pgdata:
+  redisdata:

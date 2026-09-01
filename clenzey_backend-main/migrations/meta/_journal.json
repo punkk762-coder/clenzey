@@ -1,0 +1,90 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1780506552672,
+      "tag": "20260603170912_military_human_robot",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1780657316228,
+      "tag": "20260605110156_same_frank_castle",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1780759672155,
+      "tag": "20260606152752_secret_doomsday",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1781092200411,
+      "tag": "20260610115000_careful_scalphunter",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1781707666033,
+      "tag": "20260617144746_daffy_hardball",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1782000000000,
+      "tag": "20260626120000_partner_dispatch_engine",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1782100000000,
+      "tag": "20260627120000_partner_salary_payroll",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1782200000000,
+      "tag": "20260630120000_consumer_profile_image",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1782300000000,
+      "tag": "20260701120000_dispute_evidence",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1782400000000,
+      "tag": "20260707120000_corporate_catalog_and_booking",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1782500000000,
+      "tag": "20260712120000_platform_pricing_settings",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1782600000000,
+      "tag": "20260713120000_booking_check_in_code",
+      "breakpoints": true
+    }
+  ]
+}

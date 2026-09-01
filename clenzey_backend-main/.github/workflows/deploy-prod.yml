@@ -1,0 +1,116 @@
+name: Deploy Production
+
+on:
+  workflow_dispatch:
+    inputs:
+      image_tag:
+        description: "Docker image tag (defaults to commit SHA)"
+        required: false
+        type: string
+
+concurrency:
+  group: deploy-prod
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION || 'ap-south-1' }}
+
+      - name: Login to ECR
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and push Docker image
+        env:
+          AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+          AWS_REGION: ${{ secrets.AWS_REGION || 'ap-south-1' }}
+          ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY || 'clenzey-backend' }}
+          IMAGE_TAG: ${{ inputs.image_tag || github.sha }}
+        run: |
+          ECR_REGISTRY="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
+          IMAGE_URI="${ECR_REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG}"
+          docker build -t "${IMAGE_URI}" .
+          docker push "${IMAGE_URI}"
+          docker tag "${IMAGE_URI}" "${ECR_REGISTRY}/${ECR_REPOSITORY}:latest"
+          docker push "${ECR_REGISTRY}/${ECR_REPOSITORY}:latest"
+
+      - name: Run database migrations
+        env:
+          ECS_CLUSTER: ${{ secrets.ECS_CLUSTER || 'clenzey-prod' }}
+          ECS_SUBNETS: ${{ secrets.ECS_SUBNETS }}
+          ECS_SECURITY_GROUPS: ${{ secrets.ECS_SECURITY_GROUPS }}
+          MIGRATE_TASK_DEFINITION: ${{ secrets.ECS_MIGRATE_TASK_DEFINITION || 'clenzey-backend-migrate' }}
+        run: |
+          if [ -z "${ECS_SUBNETS}" ] || [ -z "${ECS_SECURITY_GROUPS}" ]; then
+            echo "Skipping migrate run-task: set ECS_SUBNETS and ECS_SECURITY_GROUPS secrets to enable."
+            exit 0
+          fi
+
+          TASK_ARN=$(aws ecs run-task \
+            --cluster "${ECS_CLUSTER}" \
+            --task-definition "${MIGRATE_TASK_DEFINITION}" \
+            --launch-type FARGATE \
+            --network-configuration "awsvpcConfiguration={subnets=[${ECS_SUBNETS}],securityGroups=[${ECS_SECURITY_GROUPS}],assignPublicIp=DISABLED}" \
+            --overrides '{"containerOverrides":[{"name":"clenzey-backend","command":["npx","drizzle-kit","migrate","--config","drizzle-migrate.config.ts"]}]}' \
+            --query 'tasks[0].taskArn' \
+            --output text)
+
+          aws ecs wait tasks-stopped --cluster "${ECS_CLUSTER}" --tasks "${TASK_ARN}"
+
+          EXIT_CODE=$(aws ecs describe-tasks \
+            --cluster "${ECS_CLUSTER}" \
+            --tasks "${TASK_ARN}" \
+            --query 'tasks[0].containers[0].exitCode' \
+            --output text)
+
+          if [ "${EXIT_CODE}" != "0" ]; then
+            echo "Migration task failed with exit code ${EXIT_CODE}"
+            exit 1
+          fi
+
+      - name: Deploy API service to ECS
+        env:
+          ECS_CLUSTER: ${{ secrets.ECS_CLUSTER || 'clenzey-prod' }}
+          ECS_SERVICE: ${{ secrets.ECS_SERVICE || 'clenzey-backend' }}
+        run: |
+          aws ecs update-service \
+            --cluster "${ECS_CLUSTER}" \
+            --service "${ECS_SERVICE}" \
+            --force-new-deployment
+
+      - name: Deploy worker service to ECS
+        env:
+          ECS_CLUSTER: ${{ secrets.ECS_CLUSTER || 'clenzey-prod' }}
+          ECS_WORKER_SERVICE: ${{ secrets.ECS_WORKER_SERVICE || 'clenzey-backend-worker' }}
+        run: |
+          aws ecs update-service \
+            --cluster "${ECS_CLUSTER}" \
+            --service "${ECS_WORKER_SERVICE}" \
+            --force-new-deployment
+
+      - name: Wait for API service stability
+        env:
+          ECS_CLUSTER: ${{ secrets.ECS_CLUSTER || 'clenzey-prod' }}
+          ECS_SERVICE: ${{ secrets.ECS_SERVICE || 'clenzey-backend' }}
+        run: |
+          aws ecs wait services-stable \
+            --cluster "${ECS_CLUSTER}" \
+            --services "${ECS_SERVICE}"
+
+      - name: Wait for worker service stability
+        env:
+          ECS_CLUSTER: ${{ secrets.ECS_CLUSTER || 'clenzey-prod' }}
+          ECS_WORKER_SERVICE: ${{ secrets.ECS_WORKER_SERVICE || 'clenzey-backend-worker' }}
+        run: |
+          aws ecs wait services-stable \
+            --cluster "${ECS_CLUSTER}" \
+            --services "${ECS_WORKER_SERVICE}"

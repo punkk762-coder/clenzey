@@ -1,0 +1,83 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgis/postgis:16-3.4
+        env:
+          POSTGRES_USER: clenzey
+          POSTGRES_PASSWORD: clenzey_secret
+          POSTGRES_DB: clenzey
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U clenzey"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: postgresql://clenzey:clenzey_secret@localhost:5432/clenzey
+      JWT_SECRET: ci_test_jwt_secret_minimum_32_characters_long
+      NODE_ENV: dev
+      REDIS_URL: redis://localhost:6379
+      INTERNAL_API_KEY: ci_test_internal_api_key_32_chars_min!!
+      RAZORPAY_WEBHOOK_SECRET: ci_test_webhook_secret_for_e2e_tests
+      ENABLE_RATE_LIMIT: "false"
+      ENABLE_SWAGGER: "false"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Type check
+        run: pnpm type-check
+
+      - name: Unit & security tests
+        run: pnpm test:run
+
+      - name: Unit test coverage (90% threshold)
+        run: pnpm coverage
+
+      - name: E2E API tests
+        run: pnpm test:e2e
+
+      - name: Dependency audit
+        run: pnpm audit --audit-level=high
+        continue-on-error: true
+
+      - name: Build
+        run: pnpm build

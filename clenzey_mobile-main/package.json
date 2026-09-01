@@ -1,0 +1,41 @@
+{
+  "name": "clenzey-mobile",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Clenzey mobile apps monorepo — Consumer and Partner React Native (Expo) applications",
+  "pnpm": {
+    "overrides": {
+      "react": "19.1.0",
+      "react-dom": "19.1.0",
+      "react-native": "0.81.5",
+      "react-native-worklets": "0.5.1",
+      "react-native-reanimated": "4.1.1"
+    }
+  },
+  "scripts": {
+    "start": "pnpm --filter @clenzey/consumer expo-go",
+    "expo-go": "pnpm --filter @clenzey/consumer expo-go",
+    "web": "pnpm --filter @clenzey/consumer web",
+    "android": "pnpm --filter @clenzey/consumer android",
+    "ios": "pnpm --filter @clenzey/consumer ios",
+    "consumer": "pnpm --filter @clenzey/consumer",
+    "partner": "pnpm --filter @clenzey/partner",
+    "types": "pnpm --filter @clenzey/types",
+    "api-client": "pnpm --filter @clenzey/api-client",
+    "socket-client": "pnpm --filter @clenzey/socket-client",
+    "design-system": "pnpm --filter @clenzey/design-system",
+    "build:packages": "pnpm --filter './packages/*' build",
+    "typecheck": "pnpm -r run typecheck",
+    "lint": "pnpm -r run lint",
+    "test": "pnpm -r run test",
+    "clean": "pnpm -r run clean"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=8.0.0"
+  },
+  "packageManager": "pnpm@9.15.0",
+  "dependencies": {
+    "@expo-google-fonts/nunito-sans": "^0.4.2"
+  }
+}

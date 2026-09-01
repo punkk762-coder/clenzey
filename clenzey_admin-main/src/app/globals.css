@@ -1,0 +1,272 @@
+@import "tailwindcss";
+@plugin "daisyui" {
+  themes: corporate --default;
+}
+
+@theme {
+  --font-sans: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-mono), ui-monospace, monospace;
+}
+
+@layer base {
+  html,
+  body {
+    font-feature-settings: "kern", "liga";
+    overflow-x: hidden;
+    background-color: var(--color-base-200);
+  }
+
+  .input:focus,
+  .input:focus-within,
+  .select:focus,
+  .select:focus-within,
+  .textarea:focus,
+  .textarea:focus-within {
+    outline: none !important;
+    box-shadow: none !important;
+  }
+
+  input:focus,
+  input:focus-visible,
+  select:focus,
+  select:focus-visible,
+  textarea:focus,
+  textarea:focus-visible {
+    outline: none;
+    box-shadow: none;
+  }
+
+  input[type="date"] {
+    line-height: 1.25rem;
+  }
+
+  input[type="number"] {
+    appearance: textfield;
+  }
+
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    margin: 0;
+    appearance: none;
+  }
+}
+
+@layer components {
+  .num {
+    font-feature-settings: "tnum", "lnum";
+    font-variant-numeric: tabular-nums lining-nums;
+  }
+
+  .signal-dot {
+    @apply relative inline-flex h-2 w-2 rounded-full bg-primary;
+  }
+
+  .signal-dot::after {
+    content: "";
+    position: absolute;
+    inset: -3px;
+    border-radius: 9999px;
+    background: color-mix(in oklch, var(--color-primary) 40%, transparent);
+    animation: pulse-dot 1.6s ease-in-out infinite;
+    z-index: -1;
+  }
+
+  .page-stack {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .page-stack > * + * {
+    margin-top: 2rem;
+  }
+
+  .page-stack-compact {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .page-stack-compact > * + * {
+    margin-top: 1.5rem;
+  }
+
+  .admin-kpi-card,
+  .admin-table-card {
+    @apply border border-base-300 bg-base-100 shadow-sm;
+  }
+
+  .card-body {
+    @apply gap-4;
+  }
+
+  .admin-sidebar {
+    background: linear-gradient(180deg, #0f172a 0%, #111827 100%);
+    color: #e5e7eb;
+    border-color: rgb(255 255 255 / 0.08);
+  }
+
+  .admin-sidebar .admin-nav-link {
+    color: rgb(229 231 235 / 0.72);
+  }
+
+  .admin-sidebar .admin-nav-link:hover {
+    background: rgb(255 255 255 / 0.06);
+    color: #f9fafb;
+  }
+
+  .admin-sidebar .admin-nav-link[data-active="true"] {
+    background: rgb(255 255 255 / 0.1);
+    color: #ffffff;
+    box-shadow: inset 3px 0 0 0 var(--color-primary);
+  }
+
+  .admin-sidebar .admin-nav-group {
+    color: rgb(229 231 235 / 0.42);
+  }
+
+  .admin-shell-card {
+    @apply border border-base-300 bg-base-100 shadow-sm;
+  }
+
+  .fieldset {
+    @apply gap-2;
+  }
+
+  .fieldset-legend {
+    @apply mb-1 px-0 text-xs font-semibold uppercase tracking-widest opacity-70;
+  }
+
+  button.input {
+    cursor: pointer;
+  }
+
+  .admin-date-picker-popover,
+  .admin-month-picker-popover {
+    position: fixed;
+    margin: 0;
+    inset: auto;
+  }
+
+  .admin-date-picker-popover {
+    min-width: 17.5rem;
+    overflow: hidden;
+  }
+
+  .admin-date-picker-popover calendar-date {
+    display: block;
+    padding: 0.75rem;
+  }
+
+  .admin-date-picker-popover calendar-date svg[slot="previous"],
+  .admin-date-picker-popover calendar-date svg[slot="next"] {
+    height: 1rem;
+    width: 1rem;
+    fill: currentColor;
+  }
+
+  .admin-date-picker-popover calendar-month {
+    --color-accent: var(--color-primary);
+    --color-text-on-accent: var(--color-primary-content);
+  }
+
+  .admin-date-picker-popover calendar-date::part(button),
+  .admin-date-picker-popover calendar-month::part(button) {
+    border: 1px solid var(--color-base-300);
+    background-color: var(--color-base-100);
+    border-radius: 0.375rem;
+    width: 1.75rem;
+    height: 1.75rem;
+  }
+
+  .admin-date-picker-popover calendar-date::part(button):focus-visible,
+  .admin-date-picker-popover calendar-month::part(button):focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 1px;
+  }
+
+  .admin-date-picker-popover calendar-month::part(day) {
+    border-radius: 0.375rem;
+  }
+
+  .admin-month-picker-popover {
+    min-width: 15rem;
+    overflow: hidden;
+  }
+
+  :where(.input.input-bordered, .textarea.textarea-bordered, button.input) {
+    border-radius: 0.5rem !important;
+  }
+
+  :where(.btn:not(.btn-circle):not(.btn-square)) {
+    border-radius: 0.5rem !important;
+  }
+
+  :where(.btn.btn-sm) {
+    height: 2.25rem;
+    min-height: 2.25rem;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+}
+
+@keyframes pulse-dot {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(0.85);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.4s ease-out both;
+}
+
+.leaflet-container {
+  background: var(--color-base-200);
+  font-family: var(--font-sans), ui-sans-serif, system-ui;
+}
+
+.leaflet-control-attribution {
+  background: color-mix(in oklch, var(--color-base-100) 70%, transparent) !important;
+  color: var(--color-base-content) !important;
+  backdrop-filter: blur(4px);
+  font-size: 10px !important;
+}
+
+.leaflet-bar a {
+  background-color: var(--color-base-100) !important;
+  color: var(--color-base-content) !important;
+  border-color: var(--color-base-300) !important;
+}
+
+.leaflet-bar a:hover {
+  background-color: var(--color-base-200) !important;
+}
+
+.leaflet-draw-toolbar a {
+  background-color: var(--color-base-100) !important;
+}
+
+.leaflet-draw-toolbar a:hover {
+  background-color: var(--color-base-200) !important;
+}
+
+.leaflet-draw-actions a {
+  background-color: var(--color-base-100) !important;
+  color: var(--color-base-content) !important;
+}

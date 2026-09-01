@@ -1,0 +1,102 @@
+{
+  "family": "clenzey-backend-worker",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "512",
+  "memory": "1024",
+  "executionRoleArn": "arn:aws:iam::ACCOUNT_ID:role/ecsTaskExecutionRole",
+  "taskRoleArn": "arn:aws:iam::ACCOUNT_ID:role/clenzeyBackendTaskRole",
+  "containerDefinitions": [
+    {
+      "name": "clenzey-backend-worker",
+      "image": "ACCOUNT_ID.dkr.ecr.ap-south-1.amazonaws.com/clenzey-backend:latest",
+      "essential": true,
+      "command": ["node", "dist/src/workers/index.js"],
+      "environment": [
+        { "name": "NODE_ENV", "value": "prod" },
+        { "name": "LOG_LEVEL", "value": "info" }
+      ],
+      "secrets": [
+        {
+          "name": "DATABASE_URL",
+          "valueFrom": "arn:aws:secretsmanager:ap-south-1:ACCOUNT_ID:secret:clenzey/prod/database-url"
+        },
+        {
+          "name": "JWT_SECRET",
+          "valueFrom": "arn:aws:secretsmanager:ap-south-1:ACCOUNT_ID:secret:clenzey/prod/jwt-secret"
+        },
+        {
+          "name": "REDIS_URL",
+          "valueFrom": "arn:aws:secretsmanager:ap-south-1:ACCOUNT_ID:secret:clenzey/prod/redis-url"
+        },
+        {
+          "name": "MSG91_AUTH_KEY",
+          "valueFrom": "arn:aws:secretsmanager:ap-south-1:ACCOUNT_ID:secret:clenzey/prod/msg91-auth-key"
+        },
+        {
+          "name": "MSG91_SMS_FLOW_ID",
+          "valueFrom": "arn:aws:secretsmanager:ap-south-1:ACCOUNT_ID:secret:clenzey/prod/msg91-sms-flow-id"
+        },
+        {
+          "name": "FIREBASE_PROJECT_ID",
+          "valueFrom": "arn:aws:secretsmanager:ap-south-1:ACCOUNT_ID:secret:clenzey/prod/firebase-project-id"
+        },
+        {
+          "name": "FIREBASE_CLIENT_EMAIL",
+          "valueFrom": "arn:aws:secretsmanager:ap-south-1:ACCOUNT_ID:secret:clenzey/prod/firebase-client-email"
+        },
+        {
+          "name": "FIREBASE_PRIVATE_KEY",
+          "valueFrom": "arn:aws:secretsmanager:ap-south-1:ACCOUNT_ID:secret:clenzey/prod/firebase-private-key"
+        },
+        {
+          "name": "GOOGLE_MAPS_API_KEY",
+          "valueFrom": "arn:aws:secretsmanager:ap-south-1:ACCOUNT_ID:secret:clenzey/prod/google-maps-api-key"
+        },
+        {
+          "name": "RAZORPAY_KEY_ID",
+          "valueFrom": "arn:aws:secretsmanager:ap-south-1:ACCOUNT_ID:secret:clenzey/prod/razorpay-key-id"
+        },
+        {
+          "name": "RAZORPAY_KEY_SECRET",
+          "valueFrom": "arn:aws:secretsmanager:ap-south-1:ACCOUNT_ID:secret:clenzey/prod/razorpay-key-secret"
+        },
+        {
+          "name": "RAZORPAY_WEBHOOK_SECRET",
+          "valueFrom": "arn:aws:secretsmanager:ap-south-1:ACCOUNT_ID:secret:clenzey/prod/razorpay-webhook-secret"
+        },
+        {
+          "name": "ALLOWED_UPLOAD_URL_ORIGINS",
+          "valueFrom": "arn:aws:secretsmanager:ap-south-1:ACCOUNT_ID:secret:clenzey/prod/upload-url-origins"
+        },
+        {
+          "name": "OBJECT_STORAGE_BUCKET",
+          "valueFrom": "arn:aws:secretsmanager:ap-south-1:ACCOUNT_ID:secret:clenzey/prod/object-storage-bucket"
+        },
+        {
+          "name": "OBJECT_STORAGE_PUBLIC_BASE_URL",
+          "valueFrom": "arn:aws:secretsmanager:ap-south-1:ACCOUNT_ID:secret:clenzey/prod/object-storage-public-base-url"
+        },
+        {
+          "name": "INTERNAL_API_KEY",
+          "valueFrom": "arn:aws:secretsmanager:ap-south-1:ACCOUNT_ID:secret:clenzey/prod/internal-api-key"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/clenzey-backend-worker",
+          "awslogs-region": "ap-south-1",
+          "awslogs-stream-prefix": "ecs"
+        }
+      },
+      "healthCheck": {
+        "command": ["CMD-SHELL", "kill -0 1"],
+        "interval": 30,
+        "timeout": 5,
+        "retries": 3,
+        "startPeriod": 30
+      }
+    }
+  ]
+}

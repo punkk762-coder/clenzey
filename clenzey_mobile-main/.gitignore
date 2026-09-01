@@ -1,0 +1,69 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Expo
+.expo/
+dist/
+web-build/
+expo-env.d.ts
+
+# Native builds
+android/
+ios/
+*.apk
+*.aab
+*.ipa
+
+# EAS
+.easignore
+
+# Metro
+.metro-health-check*
+
+# Environment variables
+.env
+.env.local
+.env.production
+.env.*.local
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+*.log
+
+# Testing
+coverage/
+*.lcov
+
+# Build outputs
+dist/
+build/
+*.tsbuildinfo
+
+# Debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Secrets and credentials
+google-services.json
+GoogleService-Info.plist
+*.keystore
+*.jks
+*.p12
+*.key
+*.mobileprovision
+*.provisionprofile
+
+# Temporary files
+tmp/
+temp/

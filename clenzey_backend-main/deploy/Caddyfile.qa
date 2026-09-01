@@ -1,0 +1,6 @@
+# Domain is injected via QA_DOMAIN in .env.qa
+# Caddy obtains and renews Let's Encrypt certificates automatically.
+
+{$QA_DOMAIN} {
+	reverse_proxy backend:3001
+}
