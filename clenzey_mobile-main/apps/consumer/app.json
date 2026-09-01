@@ -42,13 +42,6 @@
           "locationAlwaysAndWhenInUsePermission": "Allow Clenzey to use your location to show nearby services."
         }
       ],
-      [
-        "expo-notifications",
-        {
-          "icon": "./assets/notification-icon.png",
-          "color": "#0043BA"
-        }
-      ],
       "expo-splash-screen"
     ],
     "updates": {

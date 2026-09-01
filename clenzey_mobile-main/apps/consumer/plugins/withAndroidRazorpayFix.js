@@ -31,7 +31,6 @@ function withAndroidRazorpayFix(config) {
   const usesHttp = apiUrl.startsWith('http://');
 
   config = withGradleProperties(config, (gradleConfig) => {
-    setGradleProperty(gradleConfig.modResults, 'expo.useLegacyPackaging', 'true');
     setGradleProperty(
       gradleConfig.modResults,
       'reactNativeArchitectures',
