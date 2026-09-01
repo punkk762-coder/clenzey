@@ -87,24 +87,70 @@ Testers should install the mobile APKs once. Subsequent UI improvements, bug fix
 
 ---
 
-## 5. Standard Deployment & Update Workflow
+## 5. Mumbai Supabase Migration & E2E Database Seeding
 
-### Initial Distribution (One-Time Only)
-```bash
-# Build Consumer Preview APK
-cd apps/consumer && eas build -p android --profile preview
+### Rationale
+Switched cloud database cluster from Tokyo (`ap-northeast-1`) to **AWS South Asia Mumbai (`ap-south-1`)** for lower latency in India (~15–25ms ping). Executed full E2E data seeding so all apps, admin panel, and partners are instantly interactive.
 
-# Build Partner Preview APK
-cd apps/partner && eas build -p android --profile preview
-```
-* Download the generated `.apk` files from the EAS links and share via WhatsApp to the mentor.
+### Actions Taken
+* **New Cluster Provisioned**:
+  * Region: `aws-0-ap-south-1` (Mumbai, India)
+  * Direct Migration Port (5432): `postgresql://postgres.saroufdtdwtuugnyrcph:vpqaAhENKPcogsTw@aws-0-ap-south-1.pooler.supabase.com:5432/postgres`
+  * Render App Pooler Port (6543): `postgresql://postgres.saroufdtdwtuugnyrcph:vpqaAhENKPcogsTw@aws-0-ap-south-1.pooler.supabase.com:6543/postgres`
+* **PostGIS Enabled**: Executed `CREATE EXTENSION IF NOT EXISTS postgis;` on Mumbai cluster.
+* **12 Migrations Re-applied**: Applied all 12 schema migrations cleanly.
+* **Full Database Seed Executed**: Ran `pnpm seed:prod` to seed:
+  * Platform service catalog (Quick Shine, Deep Cleaning, Pro Cleaning) & spatial zone pricing.
+  * 15-day time slots & corporate capacity schedules.
+  * Active dispatch partner pool (8 online partners across Ahmedabad Central).
+  * 37 bookings across instant, scheduled, and corporate lifecycles.
+  * Admin accounts, coupons, KYC records, reviews, and test credentials.
 
-### Publishing Future Updates (Zero Reinstall)
+---
+
+## 6. App Stability & Crash Hardening
+
+### Issues Resolved
+1. **`expo-notifications` Error Handling**: Wrapped notification channel creation, notification listeners, and cold-start handlers in defensive `try/catch` blocks inside `src/services/notifications.ts` for both apps to prevent crashes on devices without local `google-services.json`.
+2. **Schema & Config Cleanup**: Removed non-standard `minSdkVersion` and `gradleCommand` overrides in `app.json` and `eas.json`.
+3. **Expo 54 Updates Compatibility**: Pinned `expo-updates: "~29.0.20"` to match Expo SDK 54 runtime.
+
+---
+
+## 7. Admin Web App Cloud Deployment (Vercel)
+
+### Configuration
+* **Platform**: Vercel (Next.js 15)
+* **Root Directory**: `clenzey_admin-main`
+* **Environment Variables**:
+  * `NEXT_PUBLIC_API_BASE_URL`: `https://clenzey.onrender.com/api/v1`
+  * `NEXT_PUBLIC_SOCKET_URL`: `https://clenzey.onrender.com`
+* **Admin Login**: `superadmin` / `Admin@1234`
+
+---
+
+## 8. Artifacts & Live Access URLs
+
+### 📱 Android APKs (Direct Downloads for Mentor):
+* **Consumer App APK**: [Download Consumer APK](https://expo.dev/artifacts/eas/Sbb19bWTCsJldp6wB1R8VVcynhw6qphrWrDdCIpkuBE.apk)
+* **Partner App APK**: [Download Partner APK](https://expo.dev/artifacts/eas/kJr92Sk_SjPdgTz80SNseBbLqWch4-FjcrWlmxoZNTk.apk)
+
+### 🔑 Test Login Credentials:
+* **Customer**: `+919988776655` / `Test@1234` (`priya.consumer@clenzey.test`)
+* **Partner**: `+919998887766` / `Test@1234` (`amit.partner@clenzey.test`)
+* **Admin**: `superadmin` / `Admin@1234`
+
+---
+
+## 9. Standard Update Workflow (Air-to-Air OTA)
+
+Whenever new features, UI tweaks, or bug fixes are developed:
 ```bash
 # Push instant JS/UI update to Consumer App
-cd apps/consumer && eas update --branch preview --message "feature: update consumer UI"
+cd apps/consumer && npx eas-cli update --branch preview --message "feature: update description"
 
 # Push instant JS/UI update to Partner App
-cd apps/partner && eas update --branch preview --message "feature: update partner flow"
+cd apps/partner && npx eas-cli update --branch preview --message "feature: update description"
 ```
-* When the tester opens the app, the new bundle downloads automatically over the air.
+* When the tester reopens the app, the update applies over the air automatically without reinstalling the APK.
+
