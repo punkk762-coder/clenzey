@@ -1,6 +1,8 @@
 import axios, { type AxiosError, type AxiosInstance } from "axios";
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL!;
+const BASE_URL =
+  process.env.NEXT_PUBLIC_API_BASE_URL || "https://clenzey.onrender.com/api/v1";
+
 
 const STORAGE_KEY = "clenzey_admin_access_token";
 

@@ -8,17 +8,20 @@ export const isAllowedCorsOrigin = (origin: string | undefined): boolean => {
 
   const normalized = normalizeOrigin(origin);
 
-  if (envConfig.CORS_ORIGINS.includes(normalized)) {
-    return true;
-  }
-
-  if (envConfig.SOCKET_CORS_ORIGINS.includes(normalized)) {
-    return true;
-  }
-
-  if (envConfig.NODE_ENV !== "prod" && isDevTunnelOrigin(normalized)) {
+  // If wildcard configured or matches Vercel deployments
+  if (
+    envConfig.CORS_ORIGINS.includes("*") ||
+    envConfig.CORS_ORIGINS.includes(normalized) ||
+    envConfig.SOCKET_CORS_ORIGINS.includes("*") ||
+    envConfig.SOCKET_CORS_ORIGINS.includes(normalized) ||
+    normalized.endsWith(".vercel.app") ||
+    normalized.includes("localhost") ||
+    normalized.includes("127.0.0.1") ||
+    (envConfig.NODE_ENV !== "prod" && isDevTunnelOrigin(normalized))
+  ) {
     return true;
   }
 
   return false;
 };
+

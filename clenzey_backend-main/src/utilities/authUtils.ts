@@ -49,7 +49,7 @@ export const setRefreshTokenCookie = (
     httpOnly: true,
     maxAge: THIRTY_DAYS_MS,
     path: "/",
-    sameSite: "strict",
+    sameSite: envConfig.NODE_ENV === "prod" ? "none" : "lax",
     secure: envConfig.NODE_ENV === "prod",
   });
 };

@@ -91,14 +91,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return;
       }
 
+      if (!cancelled) {
+        setState({ status: "authenticated", user });
+      }
+
       try {
         const refreshed = await adminAuth.refresh();
         setStoredToken(refreshed.accessToken);
-        if (!cancelled) {
-          setState({ status: "authenticated", user });
-        }
       } catch {
-        await finishUnauthenticated();
+        // Token in localStorage is used until expired
       }
     };
 
