@@ -7,7 +7,7 @@
     "icon": "./assets/icon.png",
     "scheme": "clenzey-consumer",
     "userInterfaceStyle": "light",
-    "newArchEnabled": true,
+    "newArchEnabled": false,
     "web": {
       "bundler": "metro",
       "output": "single"

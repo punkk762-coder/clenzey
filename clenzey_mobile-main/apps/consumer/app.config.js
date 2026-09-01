@@ -26,7 +26,6 @@ module.exports = {
   },
   plugins: [
     ...plugins,
-    './plugins/withAndroidRazorpayFix.js',
   ],
   extra: {
     ...appJson.expo.extra,
