@@ -32,4 +32,14 @@ node_modules/
 *.log
 .DS_Store
 Thumbs.db
+
+# Documentation, changes, testing, and agent tools
+changes/
+docs/
+testing/
+.agents/
+agents/
 graphify-out/
+.graphify/
+*graphify*
+
