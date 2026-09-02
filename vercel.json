@@ -1,5 +1,0 @@
-{
-  "buildCommand": "cd clenzey_admin-main && pnpm build",
-  "outputDirectory": "clenzey_admin-main/.next",
-  "installCommand": "cd clenzey_admin-main && pnpm install"
-}
