@@ -45,7 +45,7 @@
       "expo-splash-screen"
     ],
     "updates": {
-      "url": "https://u.expo.dev/63668e32-188f-4a99-be75-c6cf3acd3b22"
+      "url": "https://u.expo.dev/86ecd022-e121-4855-9d9e-df8c3005f299"
     },
     "runtimeVersion": {
       "policy": "appVersion"
@@ -56,9 +56,9 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "63668e32-188f-4a99-be75-c6cf3acd3b22"
+        "projectId": "86ecd022-e121-4855-9d9e-df8c3005f299"
       }
     },
-    "owner": "punkkkkk"
+    "owner": "punkkkkks-team"
   }
 }
