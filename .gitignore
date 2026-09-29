@@ -35,7 +35,8 @@ Thumbs.db
 
 # Documentation, changes, testing, and agent tools
 changes/
-docs/
+docs/*
+!docs/admin-panel-blueprint.md
 testing/
 .agents/
 agents/
